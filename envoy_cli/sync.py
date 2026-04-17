@@ -54,6 +54,10 @@ def pull_env(name: str, passphrase: str, remote_dir: str, store_dir: Optional[st
 
     Returns the local file path.
     """
+    index = get_remote_index(remote_dir)
+    if name not in index:
+        raise KeyError(f"Remote env '{name}' is not listed in the remote index.")
+
     remote_path = Path(remote_dir) / f"{name}.env"
     if not remote_path.exists():
         raise FileNotFoundError(f"Remote env '{name}' not found at {remote_path}")
