@@ -72,6 +72,14 @@ def test_apply_profile_merges_overrides(base):
     assert result == {"A": "a", "B": "new_b", "C": "new_c"}
 
 
+def test_save_overwrites_existing_profile(base):
+    """Saving a profile with the same name should overwrite the previous data."""
+    save_profile("dev", {"DEBUG": "1"}, base_dir=base)
+    save_profile("dev", {"DEBUG": "0", "NEW_KEY": "value"}, base_dir=base)
+    data = load_profile("dev", base_dir=base)
+    assert data == {"DEBUG": "0", "NEW_KEY": "value"}
+
+
 # --- CLI tests ---
 
 @pytest.fixture()
