@@ -42,8 +42,11 @@ def show_pin(env_name):
 
 @pin_group.command("remove")
 @click.argument("env_name")
-def remove_pin_cmd(env_name):
+@click.option("--yes", is_flag=True, help="Skip confirmation prompt.")
+def remove_pin_cmd(env_name, yes):
     """Remove the pin for ENV_NAME."""
+    if not yes:
+        click.confirm(f"Remove pin for '{env_name}'?", abort=True)
     try:
         remove_pin(_base_dir, env_name)
         click.echo(f"Removed pin for '{env_name}'.")
