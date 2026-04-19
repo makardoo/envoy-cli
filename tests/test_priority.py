@@ -81,3 +81,13 @@ def test_overwrite_priority(base):
     set_priority(base, "prod", 7)
     set_priority(base, "prod", 99)
     assert get_priority(base, "prod") == 99
+
+
+def test_list_priorities_returns_correct_values(base):
+    """Ensure list_priorities returns both names and values correctly."""
+    set_priority(base, "alpha", 3)
+    set_priority(base, "beta", 7)
+    result = list_priorities(base)
+    result_dict = dict(result)
+    assert result_dict["alpha"] == 3
+    assert result_dict["beta"] == 7
