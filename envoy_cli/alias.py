@@ -54,3 +54,19 @@ def remove_alias(base_dir: str | Path, alias: str) -> None:
 
 def list_aliases(base_dir: str | Path) -> dict:
     return _load_aliases(base_dir)
+
+
+def rename_alias(base_dir: str | Path, old_alias: str, new_alias: str) -> None:
+    """Rename an existing alias to a new name, preserving its target.
+
+    Raises AliasError if old_alias does not exist or new_alias already exists.
+    """
+    if not new_alias:
+        raise AliasError("New alias name must not be empty.")
+    data = _load_aliases(base_dir)
+    if old_alias not in data:
+        raise AliasError(f"Alias '{old_alias}' not found.")
+    if new_alias in data:
+        raise AliasError(f"Alias '{new_alias}' already exists.")
+    data[new_alias] = data.pop(old_alias)
+    _save_aliases(base_dir, data)
