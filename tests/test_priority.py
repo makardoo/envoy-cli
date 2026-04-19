@@ -40,6 +40,18 @@ def test_set_invalid_priority_type_raises(base):
         set_priority(base, "prod", "high")  # type: ignore
 
 
+def test_set_negative_priority(base):
+    """Negative priorities should be stored and retrieved correctly."""
+    set_priority(base, "low", -5)
+    assert get_priority(base, "low") == -5
+
+
+def test_set_zero_priority(base):
+    """Zero is a valid priority value."""
+    set_priority(base, "neutral", 0)
+    assert get_priority(base, "neutral") == 0
+
+
 def test_remove_priority(base):
     set_priority(base, "dev", 3)
     remove_priority(base, "dev")
