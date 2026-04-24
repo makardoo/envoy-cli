@@ -11,6 +11,12 @@ def _base_dir() -> str:
     return os.environ.get("ENVOY_STORE_DIR", os.path.expanduser("~/.envoy"))
 
 
+def _handle_schedule_error(e: ScheduleError) -> None:
+    """Print a schedule error message to stderr and exit with code 1."""
+    click.echo(f"Error: {e}", err=True)
+    raise SystemExit(1)
+
+
 @click.group("schedule")
 def schedule_group():
     """Manage scheduled sync jobs."""
@@ -27,8 +33,7 @@ def add(env_name, cron, direction, profile):
         add_schedule(_base_dir(), SyncSchedule(env_name=env_name, cron=cron, direction=direction, profile=profile))
         click.echo(f"Schedule added for '{env_name}' ({direction}) with cron '{cron}'.")
     except ScheduleError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise SystemExit(1)
+        _handle_schedule_error(e)
 
 
 @schedule_group.command("remove")
@@ -40,8 +45,7 @@ def remove(env_name, direction):
         remove_schedule(_base_dir(), env_name, direction)
         click.echo(f"Schedule removed for '{env_name}' ({direction}).")
     except ScheduleError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise SystemExit(1)
+        _handle_schedule_error(e)
 
 
 @schedule_group.command("list")
@@ -65,8 +69,7 @@ def enable(env_name, direction):
         toggle_schedule(_base_dir(), env_name, direction, enabled=True)
         click.echo(f"Schedule for '{env_name}' ({direction}) enabled.")
     except ScheduleError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise SystemExit(1)
+        _handle_schedule_error(e)
 
 
 @schedule_group.command("disable")
@@ -78,5 +81,4 @@ def disable(env_name, direction):
         toggle_schedule(_base_dir(), env_name, direction, enabled=False)
         click.echo(f"Schedule for '{env_name}' ({direction}) disabled.")
     except ScheduleError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise SystemExit(1)
+        _handle_schedule_error(e)
