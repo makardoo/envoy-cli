@@ -48,6 +48,29 @@ def test_watch_file_no_change_does_not_call_callback(tmp_path):
     assert called == []
 
 
+def test_watch_file_callback_exception_does_not_stop_watching(tmp_path):
+    """Verify that an exception raised in on_change does not abort the watch loop."""
+    env_file = tmp_path / ".env"
+    env_file.write_text("A=1")
+
+    call_count = [0]
+
+    def _on_change(path):
+        call_count[0] += 1
+        raise RuntimeError("callback failure")
+
+    def _fake_sleep(_):
+        if not getattr(_fake_sleep, "modified", False):
+            _fake_sleep.modified = True
+            env_file.write_text("A=2")
+
+    with patch("envoy_cli.watch.time.sleep", side_effect=_fake_sleep):
+        # Should not propagate the RuntimeError from the callback
+        watch_file(str(env_file), on_change=_on_change, interval=0.01, max_iterations=3)
+
+    assert call_count[0] >= 1
+
+
 def test_build_sync_callback_calls_push_env(tmp_path):
     env_file = tmp_path / ".env"
     env_file.write_text("KEY=val")
